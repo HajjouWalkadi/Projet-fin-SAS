@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<time.h>
+#include <unistd.h>
 #include<stdbool.h>
 
 //sructure
@@ -13,8 +14,24 @@ typedef struct Produit{
 
 }Produit;
 
-Produit produit[100];
-int np=0;
+typedef struct stockagePrix{
+    int code;
+    char nom[50];
+    int quantite;
+    float prixTTC;
+    char date[50];
+
+}Stockage;
+
+Produit produit[100] = {
+	{4, "GHAGF", 19.30, 20.20},
+	{56, "SFFD", 19.30, 20.20},
+	{23, "LKSF", 19.30, 20.20},
+	{1, "IOHQSU", 19.30, 20.20},
+};
+int np=4;
+Stockage stockage[100];
+int sizeStockage=0;
 void ajouterproduit(){
     printf("\nentrer le code du produit :");
     scanf("%d",&produit[np].code);
@@ -39,12 +56,13 @@ void ajouterPlusieurProduit(){
 }
 void afficher(){
      int i; 
+     printf("\tCODE\tNOM\tQUANTITE\tPRIX\tPRIXTTC\n");
     for(i=0;i<np;i++){
-        printf("nom de produit %s",produit[i].nom);
-        printf("code de produit %d",produit[i].code);
-        printf("quantite de produit %d",produit[i].quantite);
-        printf("prix de produit %f",produit[i].prix);
-        printf("prixttc de produit %f\n",produit[i].prixTTC);
+    	printf("\t%d",produit[i].code);    	
+        printf("\t%s",produit[i].nom);
+        printf("\t%d",produit[i].quantite);
+        printf("\t\t%.2f",produit[i].prix);
+        printf("\t%.2f\n",produit[i].prixTTC);
         
     }
 }
@@ -78,7 +96,11 @@ void prixdecroissant(){
    }
    afficher();
 }
+
+// acheter un produit
 void acheterProduit(){
+	time_t now;//structure time_t affiche temps actuelle 
+    time(&now);//initialiser
     int i,code,quantite,indice = -1;
     afficher();
     printf("Entrer le code  :");
@@ -92,12 +114,22 @@ void acheterProduit(){
     }
    
    if(indice != -1){
+   	GL:
    	printf("Entrer le quantite  :");
     	scanf("%d",&quantite); 
-    	
-    	if(quantite <= produit[indice].quantite){
+    	if(quantite<0){ 
+			printf("Impossible d'entrer un nombre negatif\n");
+			goto GL;
+		}else if(quantite <= produit[indice].quantite){
+    		produit[indice].quantite = produit[indice].quantite - quantite; //indice= prdt acheté
     		
-    		produit[indice].quantite = produit[indice].quantite - quantite;
+    		
+    		stockage[sizeStockage].code = produit[indice].code;
+    		strcpy(stockage[sizeStockage].nom , produit[indice].nom);
+    		stockage[sizeStockage].quantite = quantite;
+    		stockage[sizeStockage].prixTTC = produit[indice].prixTTC * quantite;
+    		strcpy(stockage[sizeStockage].date , ctime(&now));
+    		sizeStockage++;
 		}else{
 			printf("cette quantite n'existe pas'");
 		}
@@ -105,51 +137,14 @@ void acheterProduit(){
    else{
    	printf("introuvable");
    }
-   	//_______________________Rechercher par code________________________ //	
+
     }
-//void rechercherCode(){
-//	int i,nbr;
-//	bool isExist = false;
-//   printf("Entrer le code  :");
-//   scanf("%d",&nbr); 
-//   
-//   for(i=0; i < np; i++){
-//   		if(produit[i].code==nbr){
-//   			isExist = true;
-//   			
-//		   }
-//   }
-//   
-//   if(isExist)
-//   printf("ce produit existe");
-//   else
-//   printf("introuvable");
-//}
-//
-//void rechercherQuantite(){
-//	int i,q;
-//	bool isExist = false;
-//   printf("Entrer la quantité  :");
-//   scanf("%d",&q); 
-//   
-//   for(i=0; i < np; i++){
-//   		if(produit[i].quantite==q){
-//   			isExist = true;
-//   			
-//		   }
-//   }
-//   
-//   if(isExist)
-//   printf("cette quantite existe");
-//   else
-//   printf("Out of stock");
-//}
-//
+
 void rechercheCode(){
   	    int c,i;
-        printf("-----------------------------------------\n");
-        printf(" -> 1 : chercher avec le code de produit :\n");
-        printf("-----------------------------------------");
+//        printf("-----------------------------------------\n");
+//        printf(" -> 1 : chercher avec le code de produit :\n");
+//        printf("-----------------------------------------");
              printf("recherche un produit ");
                       printf("donner le code de produit que vous rechercher ;");
                       scanf ("%d",&c);
@@ -163,9 +158,9 @@ void rechercheCode(){
   
 void rechercheQuantite(){
   	    int q,i;
-        printf("-----------------------------------------\n");
-        printf(" -> 2 : chercher avec le nom de produit  :\n");
-        printf("-----------------------------------------");
+//        printf("-----------------------------------------\n");
+//        printf(" -> 2 : chercher avec le nom de produit  :\n");
+//        printf("-----------------------------------------");
              printf("recherche un produit ");
                       printf("donner la quantite de produit que vous rechercher ;");
                       scanf ("%d",&q);
@@ -189,7 +184,7 @@ void rechercheQuantite(){
               
     void alimenterStock(){
 	int i,code,quantite;
-	printf("entre le code de produit :");
+	printf("Veuillez entrer le code de produit :");
 	scanf("%d",&code);
 	printf("entre la quantite de produit :");
 	scanf("%d",&quantite);
@@ -205,91 +200,114 @@ void rechercheQuantite(){
 void supprimer(){
 	int i ,c,position;
          printf("supprimer un produit \n");
-                      printf("donner le code de produit que vous voulez  supprimer ;");
+                      printf("Donner le code de produit que vous voulez  supprimer :");
                       scanf ("%d",&c);
 
                       for(i=0;i<np;i++){
                        if(c ==produit[i].code ){
                            printf("%d",i);
                          position = i;
-                       for (i=position;i<np;i++){
-                           produit[i]=produit[i+1];
-                           np--;
-                          break;
-                      }
+                         break;
                      }
                    }
+                   for (i=position;i<np;i++){
+                           produit[i]=produit[i+1];
+                      }
+                      np--;
           }
+          
+// void statistiqueVente(){
+// 	int 
+// }         
 
 
 void menu(){
-    printf("\n\t\t\t1==> Ajouter un nouveau produit:                      \n");
-	printf("--------------------------------------------------------------\n");
+	sleep(1);
+	printf("\n\t[1]==>\t\t Ajouter un nouveau produit:                      \n");
+    printf("\t[2]==>\t\t Ajouter plusieurs produits:                        \n");
+    printf("\t[3]==>\t\t Afficher un produit:                               \n");
+    printf("\t[4]==>\t\t Tri par alphabet:                                  \n");
+    printf("\t[5]==>\t\t Tri par prix:                                      \n");
+    printf("\t[6]==>\t\t Rechercher par code:                               \n");
+    printf("\t[7]==>\t\t Rechercher par quantite:                           \n");
+    printf("\t[8]==>\t\t Acheter un produit:                                \n");
+    printf("\t[9]==>\t\t Voir etat du stock:                                \n");
+    printf("\t[10]==>\t\t Alimenter le stock:                               \n");
+    printf("\t[11]==>\t\t Supprimer:                                        \n");
+    printf("\t[12]==>\t\t Statistique de vente:                             \n");
 
-    printf("2\t\t\t==> Ajouter plusieurs produits:                        \n");
-    printf("3\t\t\t==> Afficher un produit:                               \n");
-    printf("4\t\t\t==> Tri par alphabet:                                  \n");
-    printf("5\t\t\t==> Tri par prix:                                      \n");
-    printf("6\t\t\t==> Rechercher par code:                               \n");
-    printf("7\t\t\t==> Rechercher par quantité:                           \n");
-    printf("8\t\t\t==> Acheter un produit:                                \n");
-    printf("9\t\t\t==> Voir etat du stock:                                \n");
-    printf("10\t\t\t==> Alimenter le stock:                               \n");
-    printf("11\t\t\t==> supprimer:                                        \n");
+    
 }
 
 int main(){
+	printf("____________________________**BIENVENUE DANS VOTRE SYSTEME DE GESTION DE VOTRE PHARMACIE**__________________________");
+	printf("-------------------------------------------------------------------------------------------------------------------\n");
     int choix;
     debut:
     menu();
-    printf("entrer votre choix");
+    printf("Veuillez entrer votre choix: \n ");
     scanf("%d", &choix);
+	
     switch(choix){
         case 1: 
-        printf("ajouter un nouveau produit");
+        printf("Ajouter un nouveau produit: \n ");
         ajouterproduit();
         goto debut;
         case 2: 
-        printf("ajouter plusieurs produits");
+        printf("Ajouter plusieurs produits: \n");
         ajouterPlusieurProduit();
         goto debut;
         case 3: 
-        printf("afficher produit");
+        printf("Afficher produit: \n");
         afficher();
         goto debut;
         case 4: 
-        printf("tri par alphabet");
+        printf("Tri par alphabet: \n");
         alphabetcroissant();
         goto debut;
         case 5: 
-        printf("tri par prix");
+        printf("Tri par prix: \n");
         prixdecroissant();
         goto debut;
         case 6: 
-        printf("rechercher par code");
+        printf("Veuillez entrer le code de produit que vous cherchez: \n");
         rechercheCode();
         goto debut;
         case 7: 
-        printf("rechercher par quantite");
+        printf("Veuillez entrer la quantite du produit que vous cherchez: \n");
         rechercheQuantite();
         goto debut;
         case 8: 
-        printf("acheter");
+        printf("Acheter un produit: \n");
         acheterProduit();
         goto debut;
         case 9: 
-        printf("Etat du stock\n");
+        printf("Etat du stock: affichage des produits dont la quantite est inferieure a 3: \n");
         etatStock();
         goto debut;
         case 10: 
-        printf("Alimenter le stock\n");
+        printf("Veuillez alimenter le stock: \n");
         alimenterStock();
         goto debut;
         case 11: 
-        printf("Supprimer\n");
+        printf("Supprimer ce produit: \n");
         supprimer();
         goto debut;
+//        case 12: 
+//        printf("Afficher les statistiques de vente: \n");
+//        statistiqueVente();
+//        goto debut;
     }
+    
     
 
 }
+
+
+
+
+
+
+
+
+
