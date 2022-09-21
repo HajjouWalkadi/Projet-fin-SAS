@@ -5,7 +5,6 @@
 
 // sructure
 
-
 typedef struct Produit
 {
     int code;
@@ -22,7 +21,7 @@ typedef struct statistique
     char nom[50];
     int quantite;
     float prixTTC;
-    int day ;
+    int day;
     int month;
     int year;
 
@@ -36,23 +35,23 @@ int sizeStatistique = 0;
 
 void ajouterproduit()
 {
-    printf("\nentrer le code du produit :");
+    printf("\nEntrer le code du produit :");
     scanf("%d", &produit[np].code);
-    printf("entrer le nom du produit :");
+    printf("Entrer le nom du produit :");
     scanf("%s", &produit[np].nom);
-    printf("entrer la quantite du produit :");
+    printf("Entrer la quantite du produit :");
     scanf("%d", &produit[np].quantite);
-    printf("entrer le prix du produit :");
+    printf("Entrer le prix du produit :");
     scanf("%f", &produit[np].prix);
     produit[np].prixTTC = produit[np].prix + (produit[np].prix * 0.15);
-    printf("le prixTTC du produit : %.2f", produit[np].prixTTC);
+    printf("Le prixTTC du produit : %.2f", produit[np].prixTTC);
 
     np++;
 }
 void ajouterPlusieursProduit()
 {
     int i, nbr;
-    printf("entrer le nombre de produit :");
+    printf("Entrer le nombre de produit :");
     scanf("%d", &nbr);
     for (i = 0; i < nbr; i++)
     {
@@ -70,15 +69,16 @@ void afficherVendu()
         printf("\t%s", statistique[i].nom);
         printf("\t%d", statistique[i].quantite);
         printf("\t%.2f\n", statistique[i].prixTTC);
-        printf("\t%d-%d-%d\n", statistique[i].day,statistique[i].month,statistique[i].year);
+        printf("\t%d-%d-%d\n", statistique[i].day, statistique[i].month, statistique[i].year);
     }
-
 }
 
 void afficher()
 {
     int i;
-    printf("\tCODE\tNOM\tQUANTITE\tPRIX\tPRIXTTC\n");
+    //printf("\tCODE\tNOM\tQUANTITE\tPRIX\tPRIXTTC\n");
+    printf("\tCODE\t|\tNOM\t|\tQUANTITE\t|\tPRIX\t|\tPRIXTTC\n");
+    printf("-------------------------------------------------------------------------------------------------\n");
     for (i = 0; i < np; i++)
     {
         printf("\t%d", produit[i].code);
@@ -87,7 +87,6 @@ void afficher()
         printf("\t\t%.2f", produit[i].prix);
         printf("\t%.2f\n", produit[i].prixTTC);
     }
-
 }
 
 void alphabetcroissant()
@@ -134,8 +133,7 @@ void prixdecroissant()
 void acheterProduit()
 {
     time_t t = time(NULL);
-    struct tm* tm = localtime(&t); // structure time_t affiche temps actuelle
-    // initialiser
+    struct tm *tm = localtime(&t);
     int i, code, quantite, indice = -1;
     afficher();
     printf("Entrer le code  :");
@@ -168,31 +166,32 @@ void acheterProduit()
             strcpy(statistique[sizeStatistique].nom, produit[indice].nom);
             statistique[sizeStatistique].quantite = quantite;
             statistique[sizeStatistique].prixTTC = produit[indice].prixTTC * quantite;
-            statistique[sizeStatistique].day=tm->tm_mday;
-            statistique[sizeStatistique].month=tm->tm_mon + 1;
-            statistique[sizeStatistique].year=tm->tm_year + 1900;
+            statistique[sizeStatistique].day = tm->tm_mday;
+            statistique[sizeStatistique].month = tm->tm_mon + 1;
+            statistique[sizeStatistique].year = tm->tm_year + 1900;
 
             sizeStatistique++;
         }
         else
         {
-            printf("cette quantite n'existe pas'");
+            printf("Cette quantite n'existe pas'");
         }
     }
     else
     {
-        printf("introuvable");
+        printf("Quantité introuvable");
     }
-    for(i = 0 ; i < sizeStatistique ; i ++){
-        printf("%d    %f     %d",statistique[i].code, statistique[i].prixTTC,statistique[i].quantite);
+    for (i = 0; i < sizeStatistique; i++)
+    {
+        printf("%d    %f     %d", statistique[i].code, statistique[i].prixTTC, statistique[i].quantite);
     }
 }
 
 void rechercheCode()
 {
     int c, i, indice = 0;
-    printf("recherche un produit \n");
-    printf("donner le code de produit que vous recherchez ;");
+    printf("Recherche un produit \n");
+    printf("Donner le code de produit que vous recherchez ;");
     scanf("%d", &c);
     for (i = 0; i < np; i++)
     {
@@ -206,15 +205,15 @@ void rechercheCode()
     }
     if (indice == 0)
     {
-        printf("introuvable");
+        printf("Introuvable");
     }
 }
 
 void rechercheQuantite()
 {
     int q, i, indice = -1;
-    printf("recherche un produit ");
-    printf("donner la quantite de produit que vous rechercher ;");
+    printf("Recherche un produit ");
+    printf("Donner la quantite de produit que vous rechercher ;");
     scanf("%d", &q);
     for (i = 0; i < np; i++)
     {
@@ -228,13 +227,13 @@ void rechercheQuantite()
     }
     if (indice == -1)
     {
-        printf("introuvable");
+        printf("Introuvable");
     }
 }
 void etatStock()
 {
     int i, m = 0;
-    printf("\tCODE\tNOM\tQUANTITE\tPRIX\tPRIXTTC\n");
+    printf("\tCODE\t|\tNOM\t|\tQUANTITE\t|\tPRIX\t|\tPRIXTTC\n");
     for (i = 0; i < np; i++)
     {
         if (produit[i].quantite < 3)
@@ -244,11 +243,12 @@ void etatStock()
             printf("\t%d", produit[i].quantite);
             printf("\t\t%.2f", produit[i].prix);
             printf("\t%.2f\n", produit[i].prixTTC);
-            m=1;
+            m = 1;
         }
     }
-    if(m==0){
-        printf("\nAucun produit avec cette quntite\n");
+    if (m == 0)
+    {
+        printf("\nAucun produit avec cette quantite\n");
     }
 }
 
@@ -313,40 +313,38 @@ void supprimer()
     }
 }
 
-void statistiqueVente(){
+void statistiqueVente()
+{
     int i, quantiteTotal = 0;
     time_t t = time(NULL);
-    struct tm* tm = localtime(&t);
+    struct tm *tm = localtime(&t);
     afficherVendu();
-    float moyenne , prixTotal = 0 , max , min;
+    float moyenne, prixTotal = 0, max, min;
     max = statistique[0].prixTTC;
     min = statistique[0].prixTTC;
 
-    for( i = 0 ; i < sizeStatistique ; i++){
-        if(statistique[i].day == tm->tm_mday  && statistique[i].month == (tm->tm_mon + 1)  && statistique[i].year == (tm->tm_year + 1900))
+    for (i = 0; i < sizeStatistique; i++)
+    {
+        if (statistique[i].day == tm->tm_mday && statistique[i].month == (tm->tm_mon + 1) && statistique[i].year == (tm->tm_year + 1900))
         {
-        
+
             prixTotal = prixTotal + statistique[i].prixTTC;
             quantiteTotal = quantiteTotal + statistique[i].quantite;
-            if(max<statistique[i].prixTTC){
+            if (max < statistique[i].prixTTC)
+            {
                 max = statistique[i].prixTTC;
             }
-            if(min>statistique[i].prixTTC){
+            if (min > statistique[i].prixTTC)
+            {
                 min = statistique[i].prixTTC;
             }
         }
     }
-
-    // printf("%.2f\n", prixTotal);
-    // printf("%.2f\n",prixTotal/(float)quantiteTotal);
-    // printf("%.2f\n",max);
-    // printf("%.2f\n",min);
-    printf("total %.2fdhs\n", prixTotal);
-    printf("moyenne %.2f\n", moyenne);
-    printf("max %.2f\n", max);
-    printf("min %.2f\n", min);
+    printf("total:\t %.2fdhs\n", prixTotal);
+    printf("moyenne:\t %.2f\n", moyenne);
+    printf("max:\t %.2f\n", max);
+    printf("min:\t %.2f\n", min);
 }
-
 void menu()
 {
     sleep(1);
@@ -366,9 +364,9 @@ void menu()
 
 int main()
 {
-    printf("____________________________**BIENVENUE DANS VOTRE SYSTEME DE GESTION DE VOTRE PHARMACIE**__________________________");
-    printf("-------------------------------------------------------------------------------------------------------------------\n");
-    printf("---------------------------------------------------MENU------------------------------------------------------------\n");
+    printf("________________________**BIENVENUE DANS VOTRE SYSTEME DE GESTION DE VOTRE PHARMACIE**_____________________________________");
+    printf("------------------------------------------------------------------------------------------------------\n");
+    printf("---------------------------------------------------MENU-------------------------------------------------------------------\n");
     int choix;
 debut:
     menu();
