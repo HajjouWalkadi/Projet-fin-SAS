@@ -33,18 +33,33 @@ int np = 0;
 Statistique statistique[100];
 int sizeStatistique = 0;
 
-void ajouterproduit()
+void ajouterProduit()
 {
+CC:
     printf("\nEntrer le code du produit :");
     scanf("%d", &produit[np].code);
+    for (int i = 0; i < np; i++)
+    {
+        if (produit[np].code == produit[i].code)
+        {
+            printf("Ce code existe deja!!\n");
+            goto CC;
+        }
+    }
     printf("Entrer le nom du produit :");
     scanf("%s", &produit[np].nom);
     printf("Entrer la quantite du produit :");
     scanf("%d", &produit[np].quantite);
+    while (produit[np].quantite < 0)
+    {
+        printf("La quantite ne peut pas etre negative\n");
+        printf("Entrer la quantite du produit :");
+        scanf("%d", &produit[np].quantite);
+    }
     printf("Entrer le prix du produit :");
     scanf("%f", &produit[np].prix);
     produit[np].prixTTC = produit[np].prix + (produit[np].prix * 0.15);
-    printf("Le prixTTC du produit : %.2f", produit[np].prixTTC);
+    printf("Le prixTTC du produit : %.2fdh", produit[np].prixTTC);
 
     np++;
 }
@@ -55,20 +70,17 @@ void ajouterPlusieursProduit()
     scanf("%d", &nbr);
     for (i = 0; i < nbr; i++)
     {
-        ajouterproduit();
+        ajouterProduit();
     }
 }
 
 void afficherVendu()
 {
     int i;
-    printf("\tCODE\tNOM\tQUANTITE\tPRIX\tPRIXTTC\n");
     for (i = 0; i < np; i++)
     {
-        printf("\t%d", statistique[i].code);
-        printf("\t%s", statistique[i].nom);
-        printf("\t%d", statistique[i].quantite);
-        printf("\t%.2f\n", statistique[i].prixTTC);
+        printf("\t Code %d  | Nom %s | Quantite %d  | Prix %.2f\n", statistique[i].code, statistique[i].nom, statistique[i].quantite, statistique[i].prixTTC);
+
         printf("\t%d-%d-%d\n", statistique[i].day, statistique[i].month, statistique[i].year);
     }
 }
@@ -76,20 +88,15 @@ void afficherVendu()
 void afficher()
 {
     int i;
-    //printf("\tCODE\tNOM\tQUANTITE\tPRIX\tPRIXTTC\n");
     printf("\tCODE\t|\tNOM\t|\tQUANTITE\t|\tPRIX\t|\tPRIXTTC\n");
     printf("-------------------------------------------------------------------------------------------------\n");
     for (i = 0; i < np; i++)
     {
-        printf("\t%d", produit[i].code);
-        printf("\t%s", produit[i].nom);
-        printf("\t%d", produit[i].quantite);
-        printf("\t\t%.2f", produit[i].prix);
-        printf("\t%.2f\n", produit[i].prixTTC);
+        printf("\t %d        |   %s            |        %d            |            %.2f  |           %.2f\n", produit[i].code, produit[i].nom, produit[i].quantite, produit[i].prix, produit[i].prixTTC);
     }
 }
 
-void alphabetcroissant()
+void alphabetCroissant()
 {
     int i, j;
 
@@ -97,7 +104,7 @@ void alphabetcroissant()
     {
         for (j = i + 1; j < np; j++)
         {
-            if (strcmp(produit[i].nom, produit[j].nom) > 0)
+            if (strcasecmp(produit[i].nom, produit[j].nom) > 0)
             {
                 Produit zone;
                 zone = produit[i];
@@ -109,7 +116,7 @@ void alphabetcroissant()
     afficher();
 }
 
-void prixdecroissant()
+void prixDecroissant()
 {
     int i, j;
 
@@ -147,11 +154,10 @@ void acheterProduit()
             break;
         }
     }
-
     if (indice != -1)
     {
     GL:
-        printf("Entrer le quantite  :");
+        printf("Entrer la quantite  :");
         scanf("%d", &quantite);
         if (quantite < 0)
         {
@@ -160,7 +166,7 @@ void acheterProduit()
         }
         else if (quantite <= produit[indice].quantite)
         {
-            produit[indice].quantite = produit[indice].quantite - quantite; // indice= prdt acheté
+            produit[indice].quantite = produit[indice].quantite - quantite; // indice= produit achete
 
             statistique[sizeStatistique].code = produit[indice].code;
             strcpy(statistique[sizeStatistique].nom, produit[indice].nom);
@@ -179,7 +185,7 @@ void acheterProduit()
     }
     else
     {
-        printf("Quantité introuvable");
+        printf("Quantite introuvable");
     }
     for (i = 0; i < sizeStatistique; i++)
     {
@@ -189,45 +195,44 @@ void acheterProduit()
 
 void rechercheCode()
 {
-    int c, i, indice = 0;
-    printf("Recherche un produit \n");
+    int c, i, indice = -1;
+    printf("Rechercher un produit \n");
     printf("Donner le code de produit que vous recherchez ;");
     scanf("%d", &c);
     for (i = 0; i < np; i++)
     {
         if (produit[i].code == c)
         {
-            indice = 1;
+            indice = 0;
             printf("code    nom      prix      quantite \n");
-            printf("%d      %s      %.2fdh        %d     \n", produit[i].code, produit[i].nom, produit[i].prix, produit[i].quantite);
+            printf("%d      %s      %.2f dh        %d     \n", produit[i].code, produit[i].nom, produit[i].prix, produit[i].quantite);
             break;
         }
     }
-    if (indice == 0)
+    if (indice == -1)
     {
-        printf("Introuvable");
+        printf("Introuvable!!!");
     }
 }
 
 void rechercheQuantite()
 {
     int q, i, indice = -1;
-    printf("Recherche un produit ");
-    printf("Donner la quantite de produit que vous rechercher ;");
+    printf("Rechercher un produit ");
+    printf("Donner la quantite de produit que vous recherchez ;");
     scanf("%d", &q);
     for (i = 0; i < np; i++)
     {
         if (produit[i].quantite == q)
         {
             indice = i;
-            printf("code    nom      prix      quantite \n");
-            printf("%d      %s      %.2fdh        %d     \n", produit[i].code, produit[i].nom, produit[i].prix, produit[i].quantite);
+            printf(" code : %d    nom:  %s     prix : %.2f dh      quantite  %d     \n", produit[i].code, produit[i].nom, produit[i].prix, produit[i].quantite);
             break;
         }
     }
     if (indice == -1)
     {
-        printf("Introuvable");
+        printf("Introuvable!!!");
     }
 }
 void etatStock()
@@ -272,7 +277,7 @@ void alimenterStock()
             }
             else
             {
-                printf("Entrer une quantite valide\n");
+                printf("Veuillezentrer une quantite valide\n");
                 goto QUANTITE;
             }
             break;
@@ -280,7 +285,7 @@ void alimenterStock()
     }
     if (indice == -1)
     {
-        printf("Impossible d'executer cette operation!!!");
+        printf("Impossible d'executer cette operation!!! CE CODE N'EXISTE PAS!!!!");
     }
 }
 
@@ -340,10 +345,10 @@ void statistiqueVente()
             }
         }
     }
-    printf("total:\t %.2fdhs\n", prixTotal);
-    printf("moyenne:\t %.2f\n", moyenne);
-    printf("max:\t %.2f\n", max);
-    printf("min:\t %.2f\n", min);
+    printf("total:  %.2fdh\n", prixTotal);
+    printf("moyenne:   %.2f\n", moyenne);
+    printf("max:  %.2f\n", max);
+    printf("min:  %.2f\n", min);
 }
 void menu()
 {
@@ -379,7 +384,7 @@ debut:
     {
     case 1:
         printf("Ajouter un nouveau produit: \n ");
-        ajouterproduit();
+        ajouterProduit();
         goto debut;
     case 2:
         printf("Ajouter plusieurs produits: \n");
@@ -391,11 +396,11 @@ debut:
         goto debut;
     case 4:
         printf("Tri par alphabet: \n");
-        alphabetcroissant();
+        alphabetCroissant();
         goto debut;
     case 5:
         printf("Tri par prix: \n");
-        prixdecroissant();
+        prixDecroissant();
         goto debut;
     case 6:
         printf("Veuillez entrer le code de produit que vous cherchez: \n");
